@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced Health Monitor | Native Ecosystem</title>
+    
+    <meta name="theme-color" content="#2980b9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json"> <link rel="stylesheet" href="style.css"> </head>
+<body class="theme-light alto-contraste"> <nav class="top-nav" role="navigation">
+        <button data-aba="aba-diario">📊 Diário Vital</button>
+        <button data-aba="aba-biomov">🏃 BioMov AR</button>
+        <button data-aba="aba-seguranca">🔐 Segurança</button>
+        <button id="btn-contraste" title="Ativar/Desativar Alto Contraste">👁️ Acessibilidade</button>
+    </nav>
+
+    <main id="view-port">
+        </main>
+
+    <template id="tpl-diario">
+        <div class="aba active">
+            <h2>Registro Vital com Prova de Integridade</h2>
+            <div class="form-group">
+                <input type="number" id="v-sis" placeholder="Pressão Sistólica (mmHg)">
+                <input type="number" id="v-dia" placeholder="Pressão Diastólica (mmHg)">
+            }
+            </div>
+            <button id="btn-save-record">Salvar e Assinar Digitalmente</button>
+            <div id="status-diario"></div>
+        </div>
+    </template>
+
+    <template id="tpl-biomov">
+        <div class="aba">
+            <h2>BioMov AR: Correção de Postura com ML</h2>
+            <div class="ar-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="ar-overlay"></canvas> </div>
+            <button id="btn-start-ar">Iniciar Análise de Postura</button>
+        </div>
+    </template>
+
+    <button class="btn-sos-floating" id="btn-sos-trigger">🆘 SOS</button>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
