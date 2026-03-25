@@ -1,44 +1,70 @@
-// Local: backend/services/mlService.js
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap');
 
-class HealthAI {
-    static analisar(dados) {
-        const { sis, dia, mgdl } = dados;
-        let insights = [];
-        let nivelRisco = "Baixo";
-
-        // --- Lógica para Pressão Arterial ---
-        if (sis >= 140 || dia >= 90) {
-            insights.push("⚠️ Hipertensão Detectada: Reduza o sódio e descanse 15 min.");
-            nivelRisco = "Alto";
-        } else if (sis < 90) {
-            insights.push("📉 Hipotensão: Beba água e evite levantar-se rapidamente.");
-            nivelRisco = "Médio";
-        } else {
-            insights.push("✅ Pressão Arterial dentro da meta ideal.");
-        }
-
-        // --- Lógica para Glicémia ---
-        if (mgdl > 126) {
-            insights.push("🚨 Glicémia Elevada: Possível estado hiperglicémico. Evite hidratos de carbono.");
-            nivelRisco = "Crítico";
-        } else if (mgdl < 70) {
-            insights.push("🍬 Hipoglicémia: Consuma 15g de açúcar rápido imediatamente.");
-            nivelRisco = "Crítico";
-        }
-
-        // --- Análise de Tendência (Predição) ---
-        // Aqui a IA simula se o próximo valor será perigoso
-        const tendencia = (sis > 130 && mgdl > 110) ? 
-            "Prognóstico: Risco de mal-estar nas próximas 4h aumentado em 40%." : 
-            "Prognóstico: Estabilidade prevista para as próximas 12h.";
-
-        return {
-            status: nivelRisco,
-            conselhos: insights,
-            predicao: tendencia,
-            timestamp: new Date().toISOString()
-        };
-    }
+:root {
+    --accent: #00f2ff;
+    --danger: #ff0055;
+    --success: #00ff88;
+    --surface: rgba(15, 23, 42, 0.8);
 }
 
-module.exports = HealthAI;
+body {
+    background: #020617;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Background com efeito de Grid */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: -1;
+}
+
+/* Cards com Efeito de Neon */
+.card-monitor {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 4px; /* Cantos retos para parecer industrial */
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+/* Linha de "Scanning" que passa no card */
+.card-monitor::after {
+    content: "";
+    position: absolute;
+    top: -100%; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(transparent, rgba(0, 242, 255, 0.1), transparent);
+    animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: -100%; }
+    100% { top: 100%; }
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--accent);
+}
+
+input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px;
+    font-family: 'JetBrains Mono';
+    text-transform: uppercase;
+    width: 80px;
+}
