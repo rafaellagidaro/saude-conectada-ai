@@ -79,6 +79,61 @@
                 alert("🚨 SOS Ativado! Localização não disponível.");
             }
         }
+        <div id="chat-icon" onclick="toggleChat()" style="position: fixed; bottom: 100px; right: 20px; background: #27ae60; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;">
+    💬
+</div>
+
+<div id="chat-window" style="display: none; position: fixed; bottom: 170px; right: 20px; width: 300px; height: 400px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; z-index: 1000; border: 1px solid #ddd;">
+    <div style="background: #27ae60; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between;">
+        <span>Assistente OMS (AI)</span>
+        <span onclick="toggleChat()" style="cursor:pointer">✖</span>
+    </div>
+    <div id="chat-content" style="flex: 1; padding: 15px; overflow-y: auto; font-size: 14px; background: #f9f9f9;">
+        <p style="background: #eee; padding: 10px; border-radius: 10px;">Olá! Sou o assistente baseado nas diretrizes da <strong>OMS</strong>. Como posso ajudar na sua saúde hoje?</p>
+    </div>
+    <div style="padding: 10px; border-top: 1px solid #eee; display: flex;">
+        <input type="text" id="chat-input" placeholder="Pergunte sobre pressão, sal..." style="flex: 1; border: none; outline: none;">
+        <button onclick="enviarChat()" style="background: none; border: none; color: #27ae60; font-weight: bold; cursor: pointer;">Enviar</button>
+    </div>
+</div>
+
+<script>
+    // LÓGICA DO CHATBOT BASEADO NA OMS
+    function toggleChat() {
+        const chat = document.getElementById('chat-window');
+        chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function enviarChat() {
+        const input = document.getElementById('chat-input');
+        const content = document.getElementById('chat-content');
+        if(!input.value) return;
+
+        // User message
+        content.innerHTML += `<p style="text-align: right; color: #2980b9;"><b>Tu:</b> ${input.value}</p>`;
+        
+        const pergunta = input.value.toLowerCase();
+        let resposta = "Desculpe, não encontrei essa informação nos protocolos atuais da OMS. Recomendo consultar um médico presencialmente.";
+
+        // Base de Conhecimento OMS (Simulada)
+        if(pergunta.includes("pressão") || pergunta.includes("hipertensão")) {
+            resposta = "<strong>OMS diz:</strong> A hipertensão é definida como pressão sistólica ≥140 mmHg. Reduza o sal para menos de 5g por dia.";
+        } else if(pergunta.includes("sal") || pergunta.includes("sódio")) {
+            resposta = "<strong>OMS diz:</strong> Reduzir o consumo de sódio para <2g/dia (5g de sal) reduz a pressão arterial e o risco de doenças cardiovasculares.";
+        } else if(pergunta.includes("atividade") || pergunta.includes("exercício")) {
+            resposta = "<strong>OMS diz:</strong> Adultos devem fazer pelo menos 150-300 minutos de atividade física aeróbica de intensidade moderada por semana.";
+        } else if(pergunta.includes("diabetes") || pergunta.includes("açúcar")) {
+            resposta = "<strong>OMS diz:</strong> Uma dieta saudável, atividade física e evitar o tabaco podem prevenir ou retardar o diabetes tipo 2.";
+        }
+
+        setTimeout(() => {
+            content.innerHTML += `<p style="background: #e8f5e9; padding: 10px; border-radius: 10px; border-left: 4px solid #27ae60;">${resposta}</p>`;
+            content.scrollTop = content.scrollHeight;
+        }, 500);
+
+        input.value = "";
+    }
+</script>
     </script>
 </body>
 </html>
