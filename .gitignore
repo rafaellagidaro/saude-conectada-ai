@@ -1,0 +1,14 @@
+# Dependências do Node (Nunca enviar ao GitHub)
+node_modules/
+npm-debug.log
+.env
+
+# Binários do C++ (Executáveis)
+*.exe
+*.out
+validator
+core-native/validator
+
+# Outros
+.DS_Store
+dist/
