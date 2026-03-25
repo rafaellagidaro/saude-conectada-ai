@@ -78,3 +78,11 @@ class AppEngine {
 document.addEventListener('DOMContentLoaded', () => {
     AppEngine.init();
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('✅ Service Worker Ativo:', reg.scope))
+      .catch(err => console.error('❌ Falha no Service Worker:', err));
+  });
+}
