@@ -3,159 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Health Monitor - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>HealthMonitor | Core_Engine_v3</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap');
+
+        :root {
+            --accent: #00f2ff;
+            --danger: #ff0055;
+            --success: #00ff88;
+            --warning: #f1c40f;
+            --surface: rgba(15, 23, 42, 0.9);
+        }
+
+        body {
+            background: #020617;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Efeito de Grade de Fundo (Grid) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        /* Cabeçalho Estilo Sistema Operativo */
+        .sys-header {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+
+        .status-blink {
+            color: var(--success);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .card-monitor {
+            background: var(--surface);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-monitor::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .header-label {
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Display de Números Grandes */
+        .display-main {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+        }
+
+        .metric label { font-size: 0.6rem; display: block; margin-top: 5px; opacity: 0.7; }
+
+        /* Zona de Inputs */
+        .input-zone {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        input {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 242, 255, 0.4);
+            color: var(--accent);
+            padding: 12px;
+            text-align: center;
+            font-family: 'JetBrains Mono';
+            font-size: 1rem;
+        }
+
+        button {
+            grid-column: span 3;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            color: black;
+            box-shadow: 0 0 30px var(--accent);
+        }
+
+        /* Console de Logs IA */
+        .console {
+            background: #000;
+            border: 1px solid #1e293b;
+            color: var(--success);
+            font-size: 0.9rem;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .typewriter {
+            line-height: 1.6;
+        }
+
+        .critical { color: var(--danger); font-weight: bold; text-shadow: 0 0 5px var(--danger); }
+        .stable { color: var(--success); }
+
+    </style>
 </head>
 <body>
 
-    <div class="dashboard-grid">
-    <div class="card-monitor">
-        <div class="header">
-            <span class="dot"></span> LIVE TELEMETRY
-        </div>
-        
-        <div class="display-main">
-            <div class="metric">
-                <label>SYS/DIA</label>
-                <div class="stat-value" id="val-pressao">--/--</div>
-            </div>
-            <div class="metric">
-                <label>GLUCOSE</label>
-                <div class="stat-value" id="val-glicemia">--</div>
-            </div>
-        </div>
+    <header class="sys-header">
+        <div>HEALTH_OS // MODULE: CORE_ANALYTICS</div>
+        <div class="status-blink">● ENGINES_ONLINE</div>
+    </header>
 
-        <div class="input-zone">
-            <input type="number" id="sis" oninput="liveUpdate()" placeholder="SYS">
-            <input type="number" id="dia" oninput="liveUpdate()" placeholder="DIA">
-            <input type="number" id="mgdl" oninput="liveUpdate()" placeholder="GLU">
-            <button class="btn-primary" onclick="processarIA()">EXECUTE ANALYTICS</button>
-        </div>
-    </div>
-
-    <div class="card-monitor console">
-        <div class="header">IA DIAGNOSTIC ENGINE v3.0</div>
-        <div id="console-out" class="typewriter">Aguardando telemetria...</div>
-    </div>
-</div>
-    
-    <main>
-        <section id="aba-registro" class="aba active">
-            <h2>Registrar Sinais Vitais</h2>
-            <p>Os dados serão validados pelo motor C++ e auditados via SHA-256.</p>
-            
-            <label>Pressão Sistólica (mmHg):</label>
-            <input type="number" id="sis" placeholder="Ex: 120">
-            
-            <label>Pressão Diastólica (mmHg):</label>
-            <input type="number" id="dia" placeholder="Ex: 80">
-            
-            <label>Glicémia (mg/dL):</label>
-            <input type="number" id="mgdl" placeholder="Ex: 95">
-
-            <button onclick="enviarDadosSaude()">Gravar Dados no Sistema</button>
-            <div id="res-registro" style="margin-top:15px; font-weight:bold;"></div>
-        </section>
-
-        <section id="aba-agendar" class="aba">
-            <h2>Agendamento Ético</h2>
-            <p>Limite de 10 consultas por dia por profissional.</p>
-            
-            <label>Data da Consulta:</label>
-            <input type="date" id="data-consulta">
-            
-            <button onclick="agendarConsulta()">Verificar Disponibilidade e Agendar</button>
-            <div id="res-agendar" style="margin-top:15px;"></div>
-        </section>
-
-        <section id="aba-historico" class="aba">
-            <h2>Histórico e Auditoria</h2>
-            <div id="lista-historico">Carregando dados...</div>
-        </section>
-    </main>
-
-    <button class="btn-sos-floating" onclick="ativarSOS()">SOS</button>
-
-    <script>
-        const API_URL = "http://localhost:3000/api";
-
-        // Alternar entre abas
-        function mostrarAba(id) {
-            document.querySelectorAll('.aba').forEach(a => a.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'aba-historico') carregarHistorico();
-        }
-
-        // 1. Enviar Dados para o Backend
-        async function enviarDadosSaude() {
-            const dados = {
-                user_id: 1, // Simulando usuário logado
-                tipo: 'Geral',
-                sis: document.getElementById('sis').value,
-                dia: document.getElementById('dia').value,
-                mgdl: document.getElementById('mgdl').value
-            };
-
-            const res = await fetch(`${API_URL}/log-saude`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            });
-
-            const resultado = await res.json();
-            const div = document.getElementById('res-registro');
-            
-            if(res.ok) {
-                div.style.color = "green";
-                div.innerHTML = `✅ ${resultado.message} <br><small>Hash SHA-256: ${resultado.audit_id}</small>`;
-            } else {
-                div.style.color = "red";
-                div.innerHTML = `❌ Erro: ${resultado.error}`;
-            }
-        }
-
-        // 2. Agendar Consulta (Com verificação de limite)
-        async function agendarConsulta() {
-            const dados = {
-                medico_id: 101, // Exemplo de médico fixo
-                paciente_id: 1,
-                data_consulta: document.getElementById('data-consulta').value
-            };
-
-            const res = await fetch(`${API_URL}/agendar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            });
-
-            const resultado = await res.json();
-            const div = document.getElementById('res-agendar');
-
-            if(res.ok) {
-                div.innerHTML = `<p style="color:green;">✅ ${resultado.success}</p>`;
-            } else {
-                div.innerHTML = `<p style="color:red;">⚠️ ${resultado.error}</p>`;
-            }
-        }
-
-        // 3. Carregar Histórico
-        async function carregarHistorico() {
-            const res = await fetch(`${API_URL}/historico/1`);
-            const dados = await res.json();
-            const lista = document.getElementById('lista-historico');
-
-            lista.innerHTML = dados.map(item => `
-                <div style="border-bottom: 1px solid #ddd; padding: 10px;">
-                    <strong>${new Date(item.data_registro).toLocaleDateString()}</strong> - 
-                    Pressão: ${item.v_sistolica}/${item.v_diastolica} | Glicémia: ${item.v_mgdl}mg/dL
-                    <br><small style="color:gray;">Audit Hash: ${item.assinatura_hash}</small>
-                </div>
-            `).join('');
-        }
-
-        // SOS e Contraste
-        function ativarSOS() { alert("🚨 Emergência! Localização enviada para o hospital mais próximo."); }
-        function toggleContraste() { document.body.classList.toggle('alto-contraste'); }
-    </script>
-</body>
-</html>
+    <main class="dashboard-grid">
+        <div
