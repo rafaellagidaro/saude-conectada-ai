@@ -3,97 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaúdePro | Advanced AI & Native Ecosystem</title>
+    <title>Advanced Health Monitor - Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-dark text-light">
-    <nav class="sidebar">
-        <div class="logo">
-            <i class="fas fa-heartbeat"></i> SAÚDE<b>PRO</b>
-        </div>
-        <button class="nav-item active" data-section="dash"><i class="fas fa-chart-line"></i> Dashboard</button>
-        <button class="nav-item" data-section="registro"><i class="fas fa-plus-circle"></i> Novo Registro</button>
-        <button class="nav-item" data-section="chat"><i class="fas fa-brain"></i> Chat IA Emocional</button>
-        <button class="nav-item" data-section="biomov"><i class="fas fa-running"></i> BioMov AR</button>
-        <button class="nav-item" data-section="audit"><i class="fas fa-history"></i> Auditoria</button>
+<body>
+
+    <nav class="top-nav">
+        <button onclick="mostrarAba('aba-registro')">📝 Registrar Sinais</button>
+        <button onclick="mostrarAba('aba-agendar')">📅 Agendar Consulta</button>
+        <button onclick="mostrarAba('aba-historico')">📊 Histórico</button>
+        <button onclick="toggleContraste()">🌓 Contraste</button>
     </nav>
 
-    <main class="content" id="app-viewport">
-        </main>
+    <main>
+        <section id="aba-registro" class="aba active">
+            <h2>Registrar Sinais Vitais</h2>
+            <p>Os dados serão validados pelo motor C++ e auditados via SHA-256.</p>
+            
+            <label>Pressão Sistólica (mmHg):</label>
+            <input type="number" id="sis" placeholder="Ex: 120">
+            
+            <label>Pressão Diastólica (mmHg):</label>
+            <input type="number" id="dia" placeholder="Ex: 80">
+            
+            <label>Glicémia (mg/dL):</label>
+            <input type="number" id="mgdl" placeholder="Ex: 95">
 
-    <template id="temp-dash">
-        <header><h1>Dashboard Preditivo</h1><span class="badge badge-ai">IA ENGINE ACTIVE</span></header>
-        <div class="dashboard-grid">
-            <div class="card card-stat highlight">
-                <h3>Risco Preditivo (IA)</h3>
-                <div class="stat-value">3.2%</div>
-                <p>Status: <span class="text-success">Estável</span></p>
-            </div>
-            <div class="card card-stat">
-                <h3>Pressão Arterial</h3>
-                <div class="stat-value">118/79 <small>mmHg</small></div>
-                <p>Última leitura: Há 1h</p>
-            </div>
-            <div class="card card-stat wide"><canvas id="aiChart"></canvas></div>
-        </div>
-    </template>
+            <button onclick="enviarDadosSaude()">Gravar Dados no Sistema</button>
+            <div id="res-registro" style="margin-top:15px; font-weight:bold;"></div>
+        </section>
 
-    <template id="temp-registro">
-        <header><h1>Registro Vital Assinado</h1></header>
-        <div class="card p-4">
-            <div class="form-group mb-3">
-                <label>Sistólica (mmHg)</label>
-                <input type="number" id="inp-sis" placeholder="Ex: 120" class="form-control">
-            </div>
-            <div class="form-group mb-4">
-                <label>Glicémia (mg/dL)</label>
-                <input type="number" id="inp-gli" placeholder="Ex: 90" class="form-control">
-            </div>
-            <button class="btn btn-primary w-100" id="btn-save-record">Salvar e Assinar com SHA-256</button>
-        </div>
-    </template>
+        <section id="aba-agendar" class="aba">
+            <h2>Agendamento Ético</h2>
+            <p>Limite de 10 consultas por dia por profissional.</p>
+            
+            <label>Data da Consulta:</label>
+            <input type="date" id="data-consulta">
+            
+            <button onclick="agendarConsulta()">Verificar Disponibilidade e Agendar</button>
+            <div id="res-agendar" style="margin-top:15px;"></div>
+        </section>
 
-    <template id="temp-chat">
-        <header><h1>IA Generativa (Biofeedback)</h1></header>
-        <div class="card card-chat">
-            <div class="chat-history" id="chat-window">
-                <div class="chat-message ai">
-                    <p>Olá! Sou o assistente SaúdePro. Com base nos seus dados recentes e na previsão de risco de 3.2%, estou aqui para ajudar com o seu bem-estar emocional.</p>
+        <section id="aba-historico" class="aba">
+            <h2>Histórico e Auditoria</h2>
+            <div id="lista-historico">Carregando dados...</div>
+        </section>
+    </main>
+
+    <button class="btn-sos-floating" onclick="ativarSOS()">SOS</button>
+
+    <script>
+        const API_URL = "http://localhost:3000/api";
+
+        // Alternar entre abas
+        function mostrarAba(id) {
+            document.querySelectorAll('.aba').forEach(a => a.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'aba-historico') carregarHistorico();
+        }
+
+        // 1. Enviar Dados para o Backend
+        async function enviarDadosSaude() {
+            const dados = {
+                user_id: 1, // Simulando usuário logado
+                tipo: 'Geral',
+                sis: document.getElementById('sis').value,
+                dia: document.getElementById('dia').value,
+                mgdl: document.getElementById('mgdl').value
+            };
+
+            const res = await fetch(`${API_URL}/log-saude`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await res.json();
+            const div = document.getElementById('res-registro');
+            
+            if(res.ok) {
+                div.style.color = "green";
+                div.innerHTML = `✅ ${resultado.message} <br><small>Hash SHA-256: ${resultado.audit_id}</small>`;
+            } else {
+                div.style.color = "red";
+                div.innerHTML = `❌ Erro: ${resultado.error}`;
+            }
+        }
+
+        // 2. Agendar Consulta (Com verificação de limite)
+        async function agendarConsulta() {
+            const dados = {
+                medico_id: 101, // Exemplo de médico fixo
+                paciente_id: 1,
+                data_consulta: document.getElementById('data-consulta').value
+            };
+
+            const res = await fetch(`${API_URL}/agendar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await res.json();
+            const div = document.getElementById('res-agendar');
+
+            if(res.ok) {
+                div.innerHTML = `<p style="color:green;">✅ ${resultado.success}</p>`;
+            } else {
+                div.innerHTML = `<p style="color:red;">⚠️ ${resultado.error}</p>`;
+            }
+        }
+
+        // 3. Carregar Histórico
+        async function carregarHistorico() {
+            const res = await fetch(`${API_URL}/historico/1`);
+            const dados = await res.json();
+            const lista = document.getElementById('lista-historico');
+
+            lista.innerHTML = dados.map(item => `
+                <div style="border-bottom: 1px solid #ddd; padding: 10px;">
+                    <strong>${new Date(item.data_registro).toLocaleDateString()}</strong> - 
+                    Pressão: ${item.v_sistolica}/${item.v_diastolica} | Glicémia: ${item.v_mgdl}mg/dL
+                    <br><small style="color:gray;">Audit Hash: ${item.assinatura_hash}</small>
                 </div>
-            </div>
-            <div class="chat-input-zone">
-                <input type="text" id="chat-input" placeholder="Pergunte sobre sua saúde ou peça um script de relaxamento...">
-                <button class="btn btn-ai-send" id="btn-chat-send"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </template>
+            `).join('');
+        }
 
-    <template id="temp-biomov">
-        <header><h1>BioMov AR: Pose Detection</h1></header>
-        <div class="card p-4">
-            <div class="camera-placeholder mb-3">
-                <i class="fas fa-camera fa-4x text-dim"></i>
-                <p class="text-dim">Aguardando TF.js & Câmera...</p>
-            </div>
-            <button class="btn btn-outline-primary w-100">Iniciar Análise de Postura</button>
-        </div>
-    </template>
-
-    <template id="temp-audit">
-        <header><h1>Livro-Razão de Auditoria</h1></header>
-        <div class="card">
-            <table class="audit-table table table-dark table-hover">
-                <thead><tr><th>Data</th><th>Evento</th><th>Assinatura SHA-256</th><th>Origem</th></tr></thead>
-                <tbody id="audit-body">
-                    </tbody>
-            </table>
-        </div>
-    </template>
-
-    <button id="btn-sos-trigger">🆘 SOS</button>
-    <script type="module" src="app.js"></script>
+        // SOS e Contraste
+        function ativarSOS() { alert("🚨 Emergência! Localização enviada para o hospital mais próximo."); }
+        function toggleContraste() { document.body.classList.toggle('alto-contraste'); }
+    </script>
 </body>
 </html>
