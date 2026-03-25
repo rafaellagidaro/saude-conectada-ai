@@ -3,50 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaúdePro AI | Enterprise Dashboard</title>
+    <title>SaúdePro | Advanced Enterprise System</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> </head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 <body>
     <nav class="sidebar">
-        <div class="logo">SAÚDE<b>PRO</b> <small>v2.0</small></div>
-        <button class="nav-item active" data-tab="dash">📊 Dashboard</button>
-        <button class="nav-item" data-tab="ai">🧠 Motor de IA</button>
-        <button class="nav-item" data-tab="logs">🔐 Auditoria SQL</button>
-        <div class="spacer"></div>
-        <button id="btn-contraste">👁️ Acessibilidade</button>
+        <div class="logo">SAÚDE<b>PRO</b></div>
+        <button class="nav-item active" data-section="dash">📊 Dashboard</button>
+        <button class="nav-item" data-section="registro">📝 Novo Registro</button>
+        <button class="nav-item" data-section="biomov">🏃 BioMov AR</button>
+        <button class="nav-item" data-section="audit">🔐 Auditoria SQL</button>
     </nav>
 
-    <main class="content">
-        <header>
-            <h1>Monitorização em Tempo Real</h1>
-            <div class="badge">SISTEMA ATIVO</div>
-        </header>
+    <main class="content" id="app-viewport">
+        </main>
 
-        <section class="dashboard-grid">
-            <div class="card">
-                <h3>Pressão Arterial (Sistólica)</h3>
-                <div class="stat-value" id="val-pressao">118 <small>mmHg</small></div>
-                <div class="trend up">↑ 2.1% (IA Predict)</div>
+    <template id="temp-dash">
+        <header><h1>Dashboard Preditivo</h1><span class="badge">IA ACTIVE</span></header>
+        <div class="dashboard-grid">
+            <div class="card"><h3>Pressão Arterial</h3><div class="stat-value">118/79</div><p>Status: Estável</p></div>
+            <div class="card"><h3>Glicémia</h3><div class="stat-value">94</div><p>Tendência: Normal</p></div>
+            <div class="card wide"><canvas id="aiChart"></canvas></div>
+        </div>
+    </template>
+
+    <template id="temp-registro">
+        <header><h1>Novo Registro Assinado</h1></header>
+        <div class="card">
+            <div class="form-group">
+                <label>Valor Sistólica (mmHg)</label>
+                <input type="number" id="inp-sis" placeholder="Ex: 120">
+                <label>Valor Glicémia (mg/dL)</label>
+                <input type="number" id="inp-gli" placeholder="Ex: 90">
+                <button class="btn-primary" onclick="alert('Dado assinado com SHA-256 e enviado ao C++')">Gerar Assinatura Digital</button>
             </div>
+        </div>
+    </template>
 
-            <div class="card">
-                <h3>Glicémia Médiana</h3>
-                <div class="stat-value" id="val-glicemia">94 <small>mg/dL</small></div>
-                <div class="trend stable">STABLE</div>
+    <template id="temp-biomov">
+        <header><h1>BioMov AR: Visão Computacional</h1></header>
+        <div class="card ai-zone">
+            <div class="camera-placeholder">
+                <p>Aguardando Permissão da Câmara para Edge ML...</p>
             </div>
+            <button class="btn-primary">Ativar Pose Detection (TF.js)</button>
+        </div>
+    </template>
 
-            <div class="card wide">
-                <h3>Análise Preditiva (ML Engine)</h3>
-                <canvas id="aiChart"></canvas>
-            </div>
-        </section>
+    <template id="temp-audit">
+        <header><h1>Livro-Razão de Auditoria</h1></header>
+        <div class="card">
+            <table class="audit-table">
+                <thead>
+                    <tr><th>Data</th><th>Evento</th><th>Hash SHA-256</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>25/03/2026</td><td>Input Glicémia</td><td><small>8f92b...c3e1</small></td><td>✅ Verificado</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
 
-        <button id="btn-sos-trigger">🆘 SOS</button>
-    </main>
-
+    <button id="btn-sos-trigger">🆘 SOS</button>
     <script type="module" src="app.js"></script>
 </body>
 </html>
-
- 
