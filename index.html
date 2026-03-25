@@ -1,49 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Advanced Health Monitor | Native Ecosystem</title>
-    
-    <meta name="theme-color" content="#2980b9">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json"> <link rel="stylesheet" href="style.css"> </head>
-<body class="theme-light alto-contraste"> <nav class="top-nav" role="navigation">
-        <button data-aba="aba-diario">📊 Diário Vital</button>
-        <button data-aba="aba-biomov">🏃 BioMov AR</button>
-        <button data-aba="aba-seguranca">🔐 Segurança</button>
-        <button id="btn-contraste" title="Ativar/Desativar Alto Contraste">👁️ Acessibilidade</button>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaúdePro AI | Enterprise Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> </head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">SAÚDE<b>PRO</b> <small>v2.0</small></div>
+        <button class="nav-item active" data-tab="dash">📊 Dashboard</button>
+        <button class="nav-item" data-tab="ai">🧠 Motor de IA</button>
+        <button class="nav-item" data-tab="logs">🔐 Auditoria SQL</button>
+        <div class="spacer"></div>
+        <button id="btn-contraste">👁️ Acessibilidade</button>
     </nav>
 
-    <main id="view-port">
-        </main>
+    <main class="content">
+        <header>
+            <h1>Monitorização em Tempo Real</h1>
+            <div class="badge">SISTEMA ATIVO</div>
+        </header>
 
-    <template id="tpl-diario">
-        <div class="aba active">
-            <h2>Registro Vital com Prova de Integridade</h2>
-            <div class="form-group">
-                <input type="number" id="v-sis" placeholder="Pressão Sistólica (mmHg)">
-                <input type="number" id="v-dia" placeholder="Pressão Diastólica (mmHg)">
-            }
+        <section class="dashboard-grid">
+            <div class="card">
+                <h3>Pressão Arterial (Sistólica)</h3>
+                <div class="stat-value" id="val-pressao">118 <small>mmHg</small></div>
+                <div class="trend up">↑ 2.1% (IA Predict)</div>
             </div>
-            <button id="btn-save-record">Salvar e Assinar Digitalmente</button>
-            <div id="status-diario"></div>
-        </div>
-    </template>
 
-    <template id="tpl-biomov">
-        <div class="aba">
-            <h2>BioMov AR: Correção de Postura com ML</h2>
-            <div class="ar-container">
-                <video id="webcam" autoplay playsinline></video>
-                <canvas id="ar-overlay"></canvas> </div>
-            <button id="btn-start-ar">Iniciar Análise de Postura</button>
-        </div>
-    </template>
+            <div class="card">
+                <h3>Glicémia Médiana</h3>
+                <div class="stat-value" id="val-glicemia">94 <small>mg/dL</small></div>
+                <div class="trend stable">STABLE</div>
+            </div>
 
-    <button class="btn-sos-floating" id="btn-sos-trigger">🆘 SOS</button>
+            <div class="card wide">
+                <h3>Análise Preditiva (ML Engine)</h3>
+                <canvas id="aiChart"></canvas>
+            </div>
+        </section>
+
+        <button id="btn-sos-trigger">🆘 SOS</button>
+    </main>
 
     <script type="module" src="app.js"></script>
 </body>
 </html>
+
+ 
