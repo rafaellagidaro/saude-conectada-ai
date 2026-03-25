@@ -7,81 +7,77 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- CONFIGURAÇÃO DA BASE DE DADOS (SEM .ENV) ---
+// --- CONFIGURAÇÃO DA BASE DE DADOS (DADOS DIRETOS) ---
 const db = mysql.createPool({
     host: 'localhost',
-    user: 'root',           // Teu usuário do MySQL
-    password: 'sua_senha',  // Tua senha do MySQL
+    user: 'root',
+    password: 'sua_senha_aqui', // ALTERA PARA A TUA SENHA
     database: 'saude_conectada'
-});
+}).promise(); // Usamos .promise() para código mais limpo (Async/Await)
 
-// Teste de Conexão no Terminal
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error('❌ Erro ao conectar ao MySQL:', err.message);
-    } else {
-        console.log('✅ Conectado ao MySQL com Sucesso!');
-        connection.release();
+// --- ROTA DE TELEMETRIA E IA (REGISTRO + AUDITORIA) ---
+app.post('/api/log-saude', async (req, res) => {
+    try {
+        const { user_id, sis, dia, mgdl } = req.body;
+
+        // 1. Gerar Hash de Auditoria (SHA-256)
+        const hashStr = `${user_id}-${sis}-${dia}-${mgdl}-${Date.now()}`;
+        const hashAuditoria = crypto.createHash('sha256').update(hashStr).digest('hex');
+
+        // 2. Lógica de "Motor de IA" no Servidor
+        let alerta = "NORMAL";
+        if (sis > 140 || mgdl > 126) alerta = "RISCO_ELEVADO";
+
+        // 3. Gravar na Base de Dados
+        const sql = "INSERT INTO health_logs (user_id, v_sistolica, v_diastolica, v_mgdl, assinatura_hash, status_ia) VALUES (?,?,?,?,?,?)";
+        await db.query(sql, [user_id || 1, sis, dia, mgdl, hashAuditoria, alerta]);
+
+        res.json({ 
+            success: true, 
+            hash: hashAuditoria, 
+            status_ia: alerta,
+            message: "Heurística processada e auditada."
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: "Falha no Kernel de Dados", details: err.message });
     }
 });
 
-// --- ROTA 1: REGISTRO DE SAÚDE COM AUDITORIA ---
-app.post('/api/log-saude', (req, res) => {
-    const { user_id, tipo, sis, dia, mgdl } = req.body;
-    
-    // Gerar Assinatura Digital Única para o Registro
-    const hashAuditoria = crypto.createHash('sha256')
-        .update(user_id + Date.now().toString())
-        .digest('hex');
+// --- ROTA DE AGENDAMENTO ÉTICO (REGRA DOS 10) ---
+app.post('/api/agendar', async (req, res) => {
+    try {
+        const { medico_id, data_consulta } = req.body;
 
-    const sql = "INSERT INTO health_logs (user_id, tipo, v_sistolica, v_diastolica, v_mgdl, assinatura_hash) VALUES (?,?,?,?,?,?)";
-    
-    db.query(sql, [user_id, tipo, sis, dia, mgdl, hashAuditoria], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        
-        res.json({ 
-            message: "Dados registrados com sucesso!", 
-            audit_id: hashAuditoria 
-        });
-    });
-});
+        // 1. Verificar o limite de 10 (A Regra de Ouro)
+        const [rows] = await db.query(
+            "SELECT COUNT(*) as total FROM appointments WHERE medico_id = ? AND data_consulta = ?",
+            [medico_id, data_consulta]
+        );
 
-// --- ROTA 2: AGENDAMENTO COM LIMITE ÉTICO (MAX 10) ---
-app.post('/api/agendar', (req, res) => {
-    const { medico_id, paciente_id, data_consulta } = req.body;
-
-    // Verificar quantas consultas o médico já tem no dia
-    const checkSql = "SELECT COUNT(*) as total FROM appointments WHERE medico_id = ? AND data_consulta = ?";
-    
-    db.query(checkSql, [medico_id, data_consulta], (err, results) => {
-        if (err) return res.status(500).json(err);
-
-        if (results[0].total >= 10) {
-            return res.status(403).json({ 
-                error: "Limite atingido. Este médico já possui o máximo de 10 consultas para este dia." 
-            });
+        if (rows[0].total >= 10) {
+            return res.status(403).json({ error: "LIMITE_ATINGIDO", message: "Este especialista já atingiu o teto ético de 10 consultas diárias." });
         }
 
-        // Se estiver abaixo de 10, permite o agendamento
-        const insertSql = "INSERT INTO appointments (medico_id, paciente_id, data_consulta) VALUES (?,?,?)";
-        db.query(insertSql, [medico_id, paciente_id, data_consulta], (err) => {
-            if (err) return res.status(500).json(err);
-            res.json({ success: "Consulta agendada com sucesso!" });
-        });
-    });
+        // 2. Se houver vaga, agenda
+        await db.query("INSERT INTO appointments (medico_id, data_consulta) VALUES (?,?)", [medico_id, data_consulta]);
+        
+        res.json({ success: true, message: "Agendamento confirmado no sistema." });
+
+    } catch (err) {
+        res.status(500).json({ error: "Erro de Agendamento", details: err.message });
+    }
 });
 
-// --- ROTA 3: DASHBOARD DE HISTÓRICO ---
-app.get('/api/historico/:userId', (req, res) => {
-    const sql = "SELECT * FROM health_logs WHERE user_id = ? ORDER BY data_registro DESC LIMIT 20";
-    db.query(sql, [req.params.userId], (err, results) => {
-        if (err) return res.status(500).json(err);
-        res.json(results);
-    });
+// --- ROTA DE HISTÓRICO ---
+app.get('/api/historico', async (req, res) => {
+    try {
+        const [rows] = await db.query("SELECT * FROM health_logs ORDER BY data_registro DESC LIMIT 20");
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao ler histórico" });
+    }
 });
 
-// Inicialização do Servidor
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor Health Monitor rodando em http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 CORE_SYSTEM_ONLINE em http://localhost:${PORT}`));
