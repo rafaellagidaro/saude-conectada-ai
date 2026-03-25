@@ -1,0 +1,15 @@
+{
+  "short_name": "SaúdePro",
+  "name": "Advanced Health Monitor Ecosystem",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#2980b9",
+  "display": "standalone",
+  "theme_color": "#2980b9"
+}
