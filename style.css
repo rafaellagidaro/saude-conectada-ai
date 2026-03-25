@@ -1,113 +1,44 @@
-/* Local: style.css (Raiz) */
+// Local: backend/services/mlService.js
 
-:root {
-    --bg-dark: #0a0e17;
-    --card-bg: #141b2d;
-    --sidebar-bg: #000;
-    --primary: #2563eb;
-    --danger: #ef4444;
-    --text-white: #f8fafc;
-    --text-dim: #94a3b8;
-    --ai-accent: #a855f7;
+class HealthAI {
+    static analisar(dados) {
+        const { sis, dia, mgdl } = dados;
+        let insights = [];
+        let nivelRisco = "Baixo";
+
+        // --- Lógica para Pressão Arterial ---
+        if (sis >= 140 || dia >= 90) {
+            insights.push("⚠️ Hipertensão Detectada: Reduza o sódio e descanse 15 min.");
+            nivelRisco = "Alto";
+        } else if (sis < 90) {
+            insights.push("📉 Hipotensão: Beba água e evite levantar-se rapidamente.");
+            nivelRisco = "Médio";
+        } else {
+            insights.push("✅ Pressão Arterial dentro da meta ideal.");
+        }
+
+        // --- Lógica para Glicémia ---
+        if (mgdl > 126) {
+            insights.push("🚨 Glicémia Elevada: Possível estado hiperglicémico. Evite hidratos de carbono.");
+            nivelRisco = "Crítico";
+        } else if (mgdl < 70) {
+            insights.push("🍬 Hipoglicémia: Consuma 15g de açúcar rápido imediatamente.");
+            nivelRisco = "Crítico";
+        }
+
+        // --- Análise de Tendência (Predição) ---
+        // Aqui a IA simula se o próximo valor será perigoso
+        const tendencia = (sis > 130 && mgdl > 110) ? 
+            "Prognóstico: Risco de mal-estar nas próximas 4h aumentado em 40%." : 
+            "Prognóstico: Estabilidade prevista para as próximas 12h.";
+
+        return {
+            status: nivelRisco,
+            conselhos: insights,
+            predicao: tendencia,
+            timestamp: new Date().toISOString()
+        };
+    }
 }
 
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-white);
-    font-family: 'Inter', system-ui, sans-serif;
-    margin: 0;
-    display: flex;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    height: 100vh;
-    background: var(--sidebar-bg);
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #1e293b;
-    position: fixed;
-}
-
-.logo { font-size: 1.6rem; margin-bottom: 50px; color: var(--primary); font-weight: 700; }
-
-.nav-item {
-    background: transparent;
-    border: 1px solid #1e293b;
-    color: var(--text-dim);
-    padding: 14px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: 0.3s;
-    font-size: 0.95rem;
-}
-
-.nav-item.active, .nav-item:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-/* Conteúdo */
-.content { margin-left: 290px; padding: 50px; width: 100%; }
-
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-
-.badge-ai { background: #581c87; color: #d8b4fe; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-
-.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
-
-.card {
-    background: var(--card-bg);
-    padding: 28px;
-    border-radius: 18px;
-    border: 1px solid #1e293b;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-}
-
-.card.highlight { background: var(--primary); color: white; }
-
-.card.wide { grid-column: span 2; }
-
-.stat-value { font-size: 3.5rem; font-weight: 800; margin: 15px 0; }
-
-/* Utilitários Bootstrap-like */
-.mb-3 { margin-bottom: 1rem; }
-.mb-4 { margin-bottom: 1.5rem; }
-.form-control { width: 100%; background: #0a0e17; border: 1px solid #1e293b; color: white; padding: 12px; border-radius: 8px; box-sizing: border-box;}
-.btn { border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-.btn-primary { background: var(--primary); color: white; }
-.w-100 { width: 100%; }
-
-/* Auditoria */
-.audit-table { width: 100%; border-collapse: collapse; }
-.audit-table th { text-align: left; color: var(--text-dim); padding: 12px; border-bottom: 1px solid #1e293b; }
-.audit-table td { padding: 18px 12px; border-bottom: 1px solid #0a0e17; font-size: 0.9rem; }
-
-/* BioMov camera */
-.camera-placeholder { height: 350px; background: #000; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); gap: 15px; }
-
-/* 🧠 CHAT IA STYLE (A NOVA ESTILIZAÇÃO) */
-.card-chat { display: flex; flex-direction: column; height: calc(100vh - 180px); padding: 0 !important; overflow: hidden;}
-
-.chat-history { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-
-.chat-message { max-width: 80%; padding: 15px; border-radius: 12px; font-size: 0.95rem; }
-
-.chat-message.ai { background: var(--sidebar-bg); color: var(--text-dim); align-self: flex-start; border-bottom-left-radius: 2px; }
-
-.chat-message.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-
-.chat-input-zone { display: flex; padding: 15px; background: var(--sidebar-bg); border-top: 1px solid #1e293b; gap: 10px; }
-
-#chat-input { flex: 1; background: var(--bg-dark); border: 1px solid #1e293b; color: white; padding: 15px; border-radius: 8px; }
-
-.btn-ai-send { background: var(--ai-accent); color: white; border: none; padding: 15px 25px; border-radius: 8px; cursor: pointer;}
-
-/* SOS */
-#btn-sos-trigger { position: fixed; bottom: 30px; right: 30px; width: 75px; height: 75px; border-radius: 50%; background: var(--danger); color: white; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); transition: 0.3s; }
-#btn-sos-trigger:hover { transform: scale(1.1); }
+module.exports = HealthAI;
