@@ -8,13 +8,37 @@
 </head>
 <body>
 
-    <nav class="top-nav">
-        <button onclick="mostrarAba('aba-registro')">📝 Registrar Sinais</button>
-        <button onclick="mostrarAba('aba-agendar')">📅 Agendar Consulta</button>
-        <button onclick="mostrarAba('aba-historico')">📊 Histórico</button>
-        <button onclick="toggleContraste()">🌓 Contraste</button>
-    </nav>
+    <div class="dashboard-grid">
+    <div class="card-monitor">
+        <div class="header">
+            <span class="dot"></span> LIVE TELEMETRY
+        </div>
+        
+        <div class="display-main">
+            <div class="metric">
+                <label>SYS/DIA</label>
+                <div class="stat-value" id="val-pressao">--/--</div>
+            </div>
+            <div class="metric">
+                <label>GLUCOSE</label>
+                <div class="stat-value" id="val-glicemia">--</div>
+            </div>
+        </div>
 
+        <div class="input-zone">
+            <input type="number" id="sis" oninput="liveUpdate()" placeholder="SYS">
+            <input type="number" id="dia" oninput="liveUpdate()" placeholder="DIA">
+            <input type="number" id="mgdl" oninput="liveUpdate()" placeholder="GLU">
+            <button class="btn-primary" onclick="processarIA()">EXECUTE ANALYTICS</button>
+        </div>
+    </div>
+
+    <div class="card-monitor console">
+        <div class="header">IA DIAGNOSTIC ENGINE v3.0</div>
+        <div id="console-out" class="typewriter">Aguardando telemetria...</div>
+    </div>
+</div>
+    
     <main>
         <section id="aba-registro" class="aba active">
             <h2>Registrar Sinais Vitais</h2>
