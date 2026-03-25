@@ -157,6 +157,29 @@
 
         .critical { color: var(--danger); font-weight: bold; text-shadow: 0 0 5px var(--danger); }
         .stable { color: var(--success); }
+        async function runAI() {
+    // ... teus códigos de console ...
+    
+    const dados = {
+        sis: document.getElementById('sis').value,
+        dia: document.getElementById('dia').value,
+        mgdl: document.getElementById('mgdl').value
+    };
+
+    // Chamada REAL ao Backend
+    const response = await fetch('http://localhost:3000/api/log-saude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+
+    const result = await response.json();
+    
+    if(result.success) {
+        document.getElementById('disp-hash').innerText = result.hash;
+        consoleOut.innerHTML += `<br>> <span style="color:var(--success)">SISTEMA: ${result.message}</span>`;
+    }
+}
 
     </style>
 </head>
